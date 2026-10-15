@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Smart Health Monitor</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+:root{
+  --ink:#132420;
+  --ink-soft:#4a625c;
+  --teal:#0f4a41;
+  --teal-deep:#0a332d;
+  --mint:#eaf5f0;
+  --mint-line:#d3e6dd;
+  --paper:#f6f4ee;
+  --card:#ffffff;
+  --coral:#d95f3b;
+  --coral-soft:#fbe8df;
+  --amber:#c98a1a;
+  --amber-soft:#fbf1de;
+  --good:#2f8f5b;
+  --good-soft:#e6f5ec;
+  --radius-lg:22px;
+  --radius-md:14px;
+  --radius-sm:9px;
+  --shadow:0 10px 34px rgba(15,74,65,.09);
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:"Inter",Arial,sans-serif;
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+}
+
+a{color:inherit}
+
+/* focus visibility */
+button:focus-visible,input:focus-visible{
+  outline:2px solid var(--teal);
+  outline-offset:2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.001ms !important; transition-duration:.001ms !important;}
+}
+
+/* ===================== HEADER ===================== */
+
+header{
+  background:var(--teal);
+  color:#f4faf7;
+  padding:26px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+}
+
+.brand{display:flex;align-items:center;gap:14px}
+
+.heart-badge{
+  width:46px;height:46px;
+  border-radius:50%;
+  background:rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  flex:none;
+}
+
+.heart-badge svg{width:22px;height:22px}
+
+.beat{
+  animation:beat 1.35s ease-in-out infinite;
+  transform-origin:center;
+}
+
+@keyframes beat{
+  0%,100%{transform:scale(1)}
+  20%{transform:scale(1.18)}
+  40%{transform:scale(.96)}
+  60%{transform:scale(1.1)}
+}
+
+header h1{
+  margin:0;
+  font-family:"Fraunces",serif;
+  font-weight:600;
+  font-size:24px;
+  letter-spacing:.2px;
+}
+
+header p{
+  margin:4px 0 0;
+  font-size:13.5px;
+  color:#cfe6dc;
+}
+
+.status{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:9px 16px;
+  border-radius:30px;
+  background:rgba(255,255,255,.1);
+  font-size:13.5px;
+  font-weight:600;
+  white-space:nowrap;
+}
+
+.dot{
+  width:9px;height:9px;
+  border-radius:50%;
+  background:#e8b13a;
+  flex:none;
+}
+
+.dot.live{
+  background:#5fe0a0;
+  box-shadow:0 0 0 0 rgba(95,224,160,.6);
+  animation:ring 1.8s infinite;
+}
+
+@keyframes ring{
+  0%{box-shadow:0 0 0 0 rgba(95,224,160,.55)}
+  70%{box-shadow:0 0 0 8px rgba(95,224,160,0)}
+  100%{box-shadow:0 0 0 0 rgba(95,224,160,0)}
+}
+
+.dot.error{background:#e8654a}
+
+/* ===================== MAIN ===================== */
+
+main{
+  max-width:1180px;
+  margin:0 auto;
+  padding:34px 5% 60px;
+}
+
+section{margin-top:28px}
+section:first-of-type{margin-top:0}
+
+.eyebrow-row{
+  display:flex;
+  align-items:baseline;
+  justify-content:space-between;
+  margin-bottom:14px;
+}
+
+.section-title{
+  font-family:"Fraunces",serif;
+  font-weight:600;
+  font-size:19px;
+  margin:0;
+  color:var(--teal-deep);
+}
+
+.section-sub{
+  font-size:13px;
+  color:var(--ink-soft);
+  margin:2px 0 0;
+}
+
+/* ---------- connect bar ---------- */
+
+.connect-card{
+  background:var(--card);
+  border:1px solid var(--mint-line);
+  border-radius:var(--radius-lg);
+  padding:20px 22px;
+  box-shadow:var(--shadow);
+  display:grid;
+  grid-template-columns:1.2fr 1fr auto;
+  gap:12px;
+  align-items:center;
+}
+
+input{
+  padding:13px 14px;
+  border-radius:var(--radius-sm);
+  border:1.5px solid var(--mint-line);
+  font-size:14px;
+  font-family:inherit;
+  background:var(--mint);
+  color:var(--ink);
+  width:100%;
+  transition:border-color .15s ease;
+}
+
+input:focus{border-color:var(--teal)}
+
+button{
+  padding:13px 20px;
+  border-radius:var(--radius-sm);
+  border:0;
+  font-size:14px;
+  font-family:inherit;
+  font-weight:700;
+  cursor:pointer;
+  transition:background .15s ease, transform .1s ease;
+}
+
+button:active{transform:translateY(1px)}
+
+#connectBtn{
+  background:var(--teal);
+  color:#fff;
+}
+
+#connectBtn:hover{background:var(--teal-deep)}
+
+#connectBtn:disabled{
+  background:#9fb8b1;
+  cursor:progress;
+}
+
+.pin-map{
+  font-size:12.5px;
+  color:var(--ink-soft);
+  margin-top:12px;
+}
+
+.pin-map b{color:var(--ink)}
+
+/* ---------- patient alert (hero of the page) ---------- */
+
+.alert-hero{
+  background:var(--good-soft);
+  border:1.5px solid #c7e7d5;
+  border-radius:var(--radius-lg);
+  padding:28px 30px;
+  box-shadow:var(--shadow);
+  transition:background .3s ease, border-color .3s ease;
+}
+
+.alert-hero.active{
+  background:var(--coral-soft);
+  border-color:#f0bfa9;
+  animation:flash 1.4s ease-in-out 2;
+}
+
+@keyframes flash{
+  0%,100%{box-shadow:var(--shadow)}
+  50%{box-shadow:0 0 0 8px rgba(217,95,59,.14), var(--shadow)}
+}
+
+.alert-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:16px;
+}
+
+.alert-label{
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--good);
+  text-transform:uppercase;
+  letter-spacing:.4px;
+}
+
+.alert-hero.active .alert-label{color:var(--coral)}
+
+.alert-message{
+  font-family:"Fraunces",serif;
+  font-weight:600;
+  font-size:26px;
+  margin:10px 0 0;
+  color:var(--teal-deep);
+  line-height:1.3;
+}
+
+.alert-hero.active .alert-message{color:#8a3418}
+
+.alert-time{
+  font-size:13px;
+  color:var(--ink-soft);
+  white-space:nowrap;
+}
+
+/* ---------- vitals ---------- */
+
+.vitals-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+.vital-card{
+  background:var(--card);
+  border:1px solid var(--mint-line);
+  border-radius:var(--radius-md);
+  padding:20px 22px;
+}
+
+.vital-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.vital-name{
+  font-size:13px;
+  color:var(--ink-soft);
+  font-weight:600;
+}
+
+.vital-icon{font-size:19px}
+
+.vital-value{
+  font-family:"Fraunces",serif;
+  font-size:40px;
+  font-weight:600;
+  color:var(--teal-deep);
+  margin-top:8px;
+  display:inline-block;
+  transition:opacity .15s ease;
+}
+
+.vital-value.pulse-bump{animation:bump .35s ease}
+
+@keyframes bump{
+  0%{opacity:.35; transform:translateY(3px)}
+  100%{opacity:1; transform:translateY(0)}
+}
+
+.vital-unit{
+  font-size:14px;
+  color:var(--ink-soft);
+  margin-left:4px;
+}
+
+/* ---------- finger + system ---------- */
+
+.two-col{
+  display:grid;
+  grid-template-columns:1.3fr 1fr;
+  gap:16px;
+}
+
+.panel{
+  background:var(--card);
+  border:1px solid var(--mint-line);
+  border-radius:var(--radius-md);
+  padding:22px;
+}
+
+.fingers{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.finger{
+  padding:16px 8px;
+  text-align:center;
+  border-radius:var(--radius-sm);
+  background:var(--mint);
+  border:1px solid var(--mint-line);
+  font-weight:700;
+  font-size:14px;
+  color:var(--teal-deep);
+}
+
+.finger small{
+  display:block;
+  margin-top:6px;
+  color:var(--ink-soft);
+  font-weight:500;
+  font-size:12px;
+}
+
+.sys-row{
+  display:flex;
+  justify-content:space-between;
+  padding:10px 0;
+  border-bottom:1px solid var(--mint-line);
+  font-size:14px;
+}
+
+.sys-row:last-child{border-bottom:0}
+.sys-row span:first-child{color:var(--ink-soft)}
+.sys-row span:last-child{font-weight:600}
+
+/* ---------- charts ---------- */
+
+.chart-card{
+  background:var(--card);
+  border:1px solid var(--mint-line);
+  border-radius:var(--radius-md);
+  padding:22px;
+  margin-top:16px;
+}
+
+.chart-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:14px;
+}
+
+.chart-head h3{
+  margin:0;
+  font-size:14.5px;
+  font-weight:700;
+  color:var(--teal-deep);
+}
+
+.live-tag{
+  background:var(--good-soft);
+  color:var(--good);
+  padding:5px 11px;
+  border-radius:20px;
+  font-size:11.5px;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.live-tag::before{
+  content:"";
+  width:6px;height:6px;
+  border-radius:50%;
+  background:var(--good);
+  animation:ring 1.8s infinite;
+}
+
+.chart-container{height:250px;position:relative}
+
+/* ---------- history table ---------- */
+
+table{width:100%;border-collapse:collapse}
+
+th,td{
+  padding:11px 8px;
+  border-bottom:1px solid var(--mint-line);
+  text-align:left;
+  font-size:13.5px;
+}
+
+th{
+  color:var(--ink-soft);
+  font-size:12px;
+  font-weight:700;
+}
+
+/* ---------- download ---------- */
+
+.download-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+
+.btn-secondary{background:var(--teal-deep);color:#fff}
+.btn-secondary:hover{background:#062420}
+
+.btn-ghost{
+  background:transparent;
+  color:var(--coral);
+  border:1.5px solid var(--coral-soft);
+}
+.btn-ghost:hover{background:var(--coral-soft)}
+
+.note{font-size:13px;color:var(--ink-soft);margin:6px 0 0}
+
+footer{
+  text-align:center;
+  padding:30px;
+  font-size:12.5px;
+  color:var(--ink-soft);
+}
+
+/* ---------- toast ---------- */
+
+#toast{
+  position:fixed;
+  bottom:22px;
+  left:50%;
+  transform:translateX(-50%) translateY(10px);
+  background:var(--teal-deep);
+  color:#fff;
+  padding:13px 22px;
+  border-radius:30px;
+  font-size:13.5px;
+  font-weight:600;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease, transform .25s ease;
+  box-shadow:0 10px 30px rgba(0,0,0,.2);
+  z-index:50;
+}
+
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+@media(max-width:860px){
+  .vitals-grid,.two-col{grid-template-columns:1fr}
+  .connect-card{grid-template-columns:1fr}
+  header{flex-direction:column;align-items:flex-start}
+  .fingers{grid-template-columns:repeat(2,1fr)}
+  .chart-container{height:210px}
+  .alert-message{font-size:21px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    <div class="heart-badge">
+      <svg class="beat" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2.3 4.5 6 4c2-.3 3.7.7 6 3 2.3-2.3 4-3.3 6-3 3.7.5 5.6 4.1 4 7.7C19.5 16.4 12 21 12 21z" fill="#f4faf7"/>
+      </svg>
+    </div>
+    <div>
+      <h1>Smart Health Monitor</h1>
+      <p>ESP32 · Blynk Cloud · SMS Alerts for Patient Care</p>
+    </div>
+  </div>
+
+  <div class="status">
+    <span id="dot" class="dot"></span>
+    <span id="statusText">Not connected</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- CONNECT -->
+  <section>
+    <div class="connect-card">
+      <input id="token" type="password" placeholder="Blynk auth token" autocomplete="off">
+      <input id="server" value="https://blynk.cloud" placeholder="Blynk server">
+      <button id="connectBtn" onclick="start()">Connect device</button>
+    </div>
+    <p class="pin-map">
+      <b>V0</b> pulse (raw) &nbsp;·&nbsp; <b>V1</b> temperature &nbsp;·&nbsp; <b>V2</b> humidity &nbsp;·&nbsp; <b>V3</b> patient message
+    </p>
+  </section>
+
+  <!-- PATIENT ALERT — HERO -->
+  <section>
+    <div id="alertHero" class="alert-hero">
+      <div class="alert-top">
+        <div>
+          <div class="alert-label" id="alertLabel">All quiet</div>
+          <p class="alert-message" id="alertMessage">No message from patient yet</p>
+        </div>
+        <div class="alert-time" id="alertTime">—</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VITALS -->
+  <section>
+    <div class="eyebrow-row">
+      <div>
+        <h2 class="section-title">Current readings</h2>
+        <p class="section-sub">Refreshes automatically every 3 seconds while connected</p>
+      </div>
+    </div>
+
+    <div class="vitals-grid">
+      <div class="vital-card">
+        <div class="vital-top">
+          <span class="vital-name">Temperature</span>
+          <span class="vital-icon">🌡️</span>
+        </div>
+        <span class="vital-value" id="temp">—</span><span class="vital-unit">°C</span>
+      </div>
+
+      <div class="vital-card">
+        <div class="vital-top">
+          <span class="vital-name">Humidity</span>
+          <span class="vital-icon">💧</span>
+        </div>
+        <span class="vital-value" id="hum">—</span><span class="vital-unit">%</span>
+      </div>
+
+      <div class="vital-card">
+        <div class="vital-top">
+          <span class="vital-name">Pulse</span>
+          <span class="vital-icon">❤️</span>
+        </div>
+        <span class="vital-value" id="pulse">—</span><span class="vital-unit">raw ADC</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINGER + SYSTEM -->
+  <section>
+    <div class="two-col">
+      <div class="panel">
+        <h2 class="section-title" style="font-size:16px">Finger signal guide</h2>
+        <div class="fingers">
+          <div class="finger">☝️ Index<small>Help / water</small></div>
+          <div class="finger">🖕 Middle<small>Bathroom</small></div>
+          <div class="finger">🤚 Ring<small>Lonely / family</small></div>
+          <div class="finger">🤏 Little<small>Hungry / urgent</small></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title" style="font-size:16px">System</h2>
+        <div class="sys-row"><span>Controller</span><span>ESP32</span></div>
+        <div class="sys-row"><span>Cloud</span><span>Blynk IoT</span></div>
+        <div class="sys-row"><span>SMS module</span><span>SIM800L</span></div>
+        <div class="sys-row"><span>Display</span><span>16×2 I2C LCD</span></div>
+        <div class="sys-row"><span>Last update</span><span id="updated">—</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHARTS -->
+  <section>
+    <div class="eyebrow-row">
+      <div>
+        <h2 class="section-title">Trends</h2>
+        <p class="section-sub">Last 20 readings</p>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-head"><h3>Temperature (°C)</h3><span class="live-tag">Live</span></div>
+      <div class="chart-container"><canvas id="temperatureChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-head"><h3>Humidity (%)</h3><span class="live-tag">Live</span></div>
+      <div class="chart-container"><canvas id="humidityChart"></canvas></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-head"><h3>Pulse (raw ADC)</h3><span class="live-tag">Live</span></div>
+      <div class="chart-container"><canvas id="pulseChart"></canvas></div>
+    </div>
+  </section>
+
+  <!-- HISTORY -->
+  <section>
+    <div class="panel">
+      <h2 class="section-title" style="font-size:16px">Patient message history</h2>
+      <table>
+        <thead><tr><th>Date</th><th>Time</th><th>Message</th></tr></thead>
+        <tbody id="history"><tr><td colspan="3">No messages yet</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- DOWNLOAD -->
+  <section>
+    <div class="panel">
+      <h2 class="section-title" style="font-size:16px">Download patient data</h2>
+      <p class="note">CSV includes date, time, message, temperature, humidity and pulse for every recorded reading.</p>
+      <div class="download-row">
+        <button class="btn-secondary" onclick="downloadCSV()">Download full history (CSV)</button>
+        <button class="btn-secondary" onclick="downloadLatest()">Download latest reading</button>
+        <button class="btn-ghost" onclick="clearHistory()">Clear history</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>Smart Health Monitor — ESP32 + Blynk + SIM800L</footer>
+
+<div id="toast"></div>
+
+<script>
+
+/* =========================
+   STATE
+========================= */
+
+let token="";
+let base="https://blynk.cloud";
+let timer=null;
+let lastAlert="";
+let records=[];
+
+const MAX_POINTS=20;
+let labels=[], tempData=[], humData=[], pulseData=[];
+
+/* =========================
+   TOAST
+========================= */
+
+let toastTimer=null;
+function showToast(msg){
+  const t=document.getElementById("toast");
+  t.textContent=msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove("show"),3200);
+}
+
+/* =========================
+   CHARTS
+========================= */
+
+const commonOptions={
+  responsive:true,
+  maintainAspectRatio:false,
+  animation:{duration:600,easing:"easeOutQuart"},
+  interaction:{intersect:false,mode:"index"},
+  plugins:{legend:{display:false}},
+  scales:{x:{title:{display:true,text:"Time"},grid:{display:false}}}
+};
+
+function makeChart(canvasId,label,data,extraScale){
+  return new Chart(document.getElementById(canvasId),{
+    type:"line",
+    data:{labels,datasets:[{
+      label, data,
+      borderColor:"#0f4a41",
+      backgroundColor:"rgba(15,74,65,.08)",
+      borderWidth:2.5, tension:.4, fill:true,
+      pointRadius:3, pointHoverRadius:7,
+      pointBackgroundColor:"#0f4a41"
+    }]},
+    options:{...commonOptions, scales:{...commonOptions.scales, y:extraScale}}
+  });
+}
+
+const temperatureChart=makeChart("temperatureChart","Temperature",tempData,{title:{display:true,text:"°C"}});
+const humidityChart=makeChart("humidityChart","Humidity",humData,{min:0,max:100,title:{display:true,text:"%"}});
+const pulseChart=makeChart("pulseChart","Pulse",pulseData,{beginAtZero:true,title:{display:true,text:"raw ADC"}});
+
+/* =========================
+   STATUS
+========================= */
+
+function setStatus(state,text){
+  document.getElementById("statusText").textContent=text;
+  const dot=document.getElementById("dot");
+  dot.className="dot"+(state==="live"?" live":state==="error"?" error":"");
+}
+
+/* =========================
+   BLYNK API
+========================= */
+
+async function getPin(pin){
+  const url=`${base}/external/api/get?token=${encodeURIComponent(token)}&${pin}`;
+  const response=await fetch(url,{cache:"no-store"});
+  if(!response.ok) throw new Error("HTTP "+response.status);
+  return await response.text();
+}
+
+/* =========================
+   TIME
+========================= */
+
+function nowParts(){
+  const d=new Date();
+  return{
+    date:d.toLocaleDateString("en-IN"),
+    time:d.toLocaleTimeString("en-IN",{hour:"2-digit",minute:"2-digit",second:"2-digit"})
+  };
+}
+
+/* =========================
+   GRAPHS
+========================= */
+
+function updateGraphs(temp,hum,pulse){
+  const time=nowParts().time;
+  labels.push(time);
+  tempData.push(Number.isFinite(temp)?temp:null);
+  humData.push(Number.isFinite(hum)?hum:null);
+  pulseData.push(Number.isFinite(pulse)?pulse:null);
+
+  if(labels.length>MAX_POINTS){
+    labels.shift(); tempData.shift(); humData.shift(); pulseData.shift();
+  }
+
+  temperatureChart.update();
+  humidityChart.update();
+  pulseChart.update();
+}
+
+/* =========================
+   VALUE BUMP ANIMATION
+========================= */
+
+function animateValue(id){
+  const el=document.getElementById(id);
+  el.classList.remove("pulse-bump");
+  void el.offsetWidth;
+  el.classList.add("pulse-bump");
+}
+
+/* =========================
+   RECORDS + HISTORY
+========================= */
+
+function addRecord(alertMsg,temp,hum,pulse){
+  const t=nowParts();
+  records.push({date:t.date,time:t.time,alert:alertMsg||"",temp,hum,pulse});
+  if(records.length>500) records.shift();
+  renderHistory();
+}
+
+function renderHistory(){
+  const tbody=document.getElementById("history");
+  const withAlerts=records.slice().reverse().filter(r=>r.alert).slice(0,10);
+
+  if(!withAlerts.length){
+    tbody.innerHTML='<tr><td colspan="3">No messages yet</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML="";
+  withAlerts.forEach(r=>{
+    const row=document.createElement("tr");
+    row.innerHTML="<td></td><td></td><td></td>";
+    row.children[0].textContent=r.date;
+    row.children[1].textContent=r.time;
+    row.children[2].textContent=r.alert;
+    tbody.appendChild(row);
+  });
+}
+
+/* =========================
+   ALERT HERO
+========================= */
+
+function setAlertHero(msg){
+  const hero=document.getElementById("alertHero");
+  const label=document.getElementById("alertLabel");
+  const message=document.getElementById("alertMessage");
+  const time=document.getElementById("alertTime");
+
+  if(msg){
+    hero.classList.add("active");
+    label.textContent="New message";
+    message.textContent=msg;
+    time.textContent=nowParts().time;
+    showToast("Patient message: "+msg);
+    setTimeout(()=>hero.classList.remove("active"),2800);
+  }
+}
+
+/* =========================
+   MAIN UPDATE LOOP
+========================= */
+
+async function update(){
+  if(!token) return;
+
+  try{
+    const [pulse,temp,hum,alert]=await Promise.all([
+      getPin("v0"), getPin("v1"), getPin("v2"), getPin("v3")
+    ]);
+
+    const p=Number(pulse), t=Number(temp), h=Number(hum);
+
+    document.getElementById("pulse").textContent=Number.isFinite(p)?p.toFixed(0):"—";
+    document.getElementById("temp").textContent=Number.isFinite(t)?t.toFixed(1):"—";
+    document.getElementById("hum").textContent=Number.isFinite(h)?h.toFixed(0):"—";
+
+    animateValue("pulse"); animateValue("temp"); animateValue("hum");
+
+    const msg=(alert && alert!=="null") ? alert : "";
+    if(msg && msg!==lastAlert){
+      lastAlert=msg;
+      setAlertHero(msg);
+    }
+
+    updateGraphs(t,h,p);
+    addRecord(msg,t,h,p);
+
+    const tp=nowParts();
+    document.getElementById("updated").textContent=tp.date+" "+tp.time;
+
+    setStatus("live","Connected");
+  }
+  catch(error){
+    console.error(error);
+    setStatus("error","Connection error");
+  }
+}
+
+/* =========================
+   START / CONNECT
+========================= */
+
+function start(){
+  const btn=document.getElementById("connectBtn");
+  token=document.getElementById("token").value.trim();
+  base=document.getElementById("server").value.trim().replace(/\/+$/,"");
+
+  if(!token){
+    showToast("Enter your Blynk auth token to connect.");
+    document.getElementById("token").focus();
+    return;
+  }
+
+  localStorage.setItem("smartHealthToken",token);
+
+  labels.length=0; tempData.length=0; humData.length=0; pulseData.length=0;
+  temperatureChart.update(); humidityChart.update(); pulseChart.update();
+
+  btn.disabled=true;
+  btn.textContent="Connecting…";
+  setStatus("","Connecting…");
+
+  update().finally(()=>{
+    btn.disabled=false;
+    btn.textContent="Reconnect";
+  });
+
+  if(timer) clearInterval(timer);
+  timer=setInterval(update,3000);
+}
+
+/* =========================
+   CSV EXPORT
+========================= */
+
+function csvEscape(v){
+  return '"'+String(v??"").replace(/"/g,'""')+'"';
+}
+
+function rowsToCSV(rows){
+  return rows.map(row=>row.map(csvEscape).join(",")).join("\r\n");
+}
+
+function triggerDownload(csv,filename){
+  const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8;"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function downloadCSV(){
+  if(!records.length){ showToast("No patient data recorded yet."); return; }
+  const rows=[["Date","Time","Patient Message","Temperature (°C)","Humidity (%)","Pulse (raw ADC)"]];
+  records.forEach(r=>rows.push([r.date,r.time,r.alert,r.temp,r.hum,r.pulse]));
+  triggerDownload(rowsToCSV(rows),"Smart_Health_Patient_History.csv");
+  showToast("History downloaded.");
+}
+
+function downloadLatest(){
+  if(!records.length){ showToast("No latest reading available."); return; }
+  const r=records[records.length-1];
+  const rows=[
+    ["Date","Time","Patient Message","Temperature (°C)","Humidity (%)","Pulse (raw ADC)"],
+    [r.date,r.time,r.alert,r.temp,r.hum,r.pulse]
+  ];
+  triggerDownload(rowsToCSV(rows),"Smart_Health_Latest_Reading.csv");
+  showToast("Latest reading downloaded.");
+}
+
+function clearHistory(){
+  if(confirm("Clear all recorded history?")){
+    records=[];
+    lastAlert="";
+    renderHistory();
+    showToast("History cleared.");
+  }
+}
+
+/* =========================
+   LOAD SAVED TOKEN
+========================= */
+
+window.addEventListener("load",()=>{
+  const saved=localStorage.getItem("smartHealthToken");
+  if(saved) document.getElementById("token").value=saved;
+});
+
+</script>
+
+</body>
+</html>
